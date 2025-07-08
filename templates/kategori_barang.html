@@ -1,0 +1,195 @@
+{% extends 'sidebar.html' %} {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="container">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+<!-- MAIN -->
+<main>
+    <div class="head-title">
+        <div class="left">
+            <h1>Daftar Kategori</h1>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">Dashboard</a>
+                </li>
+                <li><i class="bx bx-chevron-right"></i></li>
+                <li>
+                    <a class="active" href="{{ url_for('kategori_barang')}}">Kategori Barang</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="table-data">
+        <div class="order">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inputkategori">
+                    + Tambah Kategori
+                </button>
+                <input class="form-control w-25 me-5" type="search" id="searchInput" placeholder="Search"
+                    aria-label="Search" style="background-color: #ffffff;">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Kategori</th>
+                        <th>Aksi </th>
+                    </tr>
+                </thead>
+                <tbody id="kategoriTableBody">
+                    <!-- Looping data produk -->
+                    {% for kategori in kategori %}
+                    <tr>
+                        <td>{{ loop.index }}</td> <!-- Menampilkan nomor urut dari loop -->
+                        <td>{{ kategori[1] }}</td> <!-- Kategori -->
+                        <td>
+                            <!-- Tombol Edit -->
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                data-bs-target="#editkategori" data-bs-id="{{ kategori[0] }}"
+                                data-bs-nama="{{ kategori[1] }}">
+                                Edit
+                            </button>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#hapuskategori" data-bs-id="{{ kategori[0] }}">
+                                Hapus
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<!-- Modal Insert Kategori -->
+<div class="modal fade" id="inputkategori" tabindex="-1" aria-labelledby="inputkategori" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inputKategoriLabel">Tambah Kategori</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="kategoriForm" method="post" action="{{ url_for('tambah_kategori') }}">
+                <div class="modal-body">
+                    <!-- Nama Kategori -->
+                    <div class="mb-3">
+                        <label for="nama_kategori" class="form-label">Nama Kategori</label>
+                        <input type="text" class="form-control" id="nama_kategori" name="nama_kategori" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Hapus Kategori -->
+<div class="modal fade" id="hapuskategori" tabindex="-1" aria-labelledby="hapusKategoriLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="hapusKategoriLabel">Konfirmasi Penghapusan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Apakah Anda yakin ingin menghapus kategori ini?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <!-- Form untuk menghapus kategori -->
+                <form id="hapusKategoriForm" action="" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Hapus</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Edit Kategori -->
+<div class="modal fade" id="editkategori" tabindex="-1" aria-labelledby="editKategoriLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editKategoriLabel">Edit Kategori</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editKategoriForm" method="post" action="">
+                <div class="modal-body">
+                    <!-- Nama Kategori -->
+                    <div class="mb-3">
+                        <label for="edit_nama_kategori" class="form-label">Nama
+                            Kategori</label>
+                        <input type="text" class="form-control" id="edit_nama_kategori" name="nama_kategori" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    const hapusKategoriModal = document.getElementById('hapuskategori');
+    hapusKategoriModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;  // Tombol yang men-trigger modal
+        const kategoriId = button.getAttribute('data-bs-id');  // Ambil ID kategori
+        const modalform = hapusKategoriModal.querySelector('#hapusKategoriForm');
+        modalform.action = '/hapus_kategori/' + kategoriId;
+    });
+
+    const editKategoriModal = document.getElementById('editkategori');
+    editKategoriModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const kategoriId = button.getAttribute('data-bs-id');
+        const namaKategori = button.getAttribute('data-bs-nama');
+        const modalform = editKategoriModal.querySelector('#editKategoriForm');
+        //isi form
+        modalform.action = '/edit_kategori/' + kategoriId;
+        modalform.querySelector('#edit_nama_kategori').value = namaKategori;
+    });
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const query = this.value; // Ambil nilai input pencarian
+
+        // Lakukan permintaan AJAX ke server
+        fetch(`/search_kategori?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                const kategoriTableBody = document.getElementById('kategoriTableBody');
+                kategoriTableBody.innerHTML = ''; // Kosongkan isi tabel sebelumnya
+
+                // Loop melalui data yang diterima dan perbarui tabel
+                data.forEach((kategori, index) => {
+                    const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${kategori.nama_kategori}</td>
+                        <td>
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" 
+                                data-bs-target="#editkategori" data-bs-id="${kategori.id}" 
+                                data-bs-nama="${kategori.nama_kategori}">
+                                Edit
+                            </button>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" 
+                                data-bs-target="#hapuskategori" data-bs-id="${kategori.id}">
+                                Hapus
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                    kategoriTableBody.insertAdjacentHTML('beforeend', row);
+                });
+            })
+            .catch(error => console.error('Error fetching search results:', error));
+    });
+
+</script>
+{% endblock %}

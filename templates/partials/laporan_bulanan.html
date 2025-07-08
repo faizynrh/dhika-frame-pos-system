@@ -1,0 +1,20 @@
+<table>
+    <thead>
+        <tr>
+            <th>Bulan</th>
+            <th>Total Pendapatan</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set bulan_mapping = {
+        1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April', 5: 'Mei', 6: 'Juni',
+        7: 'Juli', 8: 'Agustus', 9: 'September', 10: 'Oktober', 11: 'November', 12: 'Desember'
+        } %}
+        {% for row in penjualan_bulanan %}
+        <tr>
+            <td>{{ bulan_mapping[row[0]] }}</td> <!-- Konversi bulan menjadi nama bulan -->
+            <td>Rp. {{ "{:,.0f}".format(row[1]) }}</td> <!-- Total Pendapatan dalam format rupiah -->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

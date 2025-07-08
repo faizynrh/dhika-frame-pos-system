@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .header p {
+            margin: 0;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .table th,
+        .table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f2f2f2;
+        }
+
+        .total {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    {% set bulan_names = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus',
+    'September', 'Oktober', 'November', 'Desember'] %}
+    <div class="header">
+        <h1>Dhika Frame Store</h1>
+        <p>Kp Citaman, RT.04/RW.18, Cigugur Tengah,</p>
+        <p> Kec. Cimahi Tengah, Kota Cimahi, Jawa Barat 40522</p>
+    </div>
+    <hr>
+    <h2>Laporan Penjualan</h2>
+    <p>Periode: {{ periode }}</p>
+    {% if penjualan_bulanan %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Bulan</th>
+                <th>Total Penjualan</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in penjualan_bulanan %}
+            <tr>
+                <td>
+
+                    {{ bulan_names[row[0] - 1] }}
+                </td>
+                <td>Rp. {{ "{:,.0f}".format(row[1]) }}</td>
+            </tr>
+            {% endfor %}
+            {% if total_transaksi is not none %}
+            <tr>
+                <td>
+                    <b>Total Transaksi Tahun {{ periode.split()[-1] }}</b>
+                </td>
+                <td><b>Rp. {{ "{:,.0f}".format(total_transaksi) }}</b></td>
+            </tr>
+            <!-- <div class="total">
+                <p>: Rp. {{ "{:,.0f}".format(total_transaksi) }}</p>
+            </div> -->
+            {% endif %}
+        </tbody>
+    </table>
+    {% elif penjualan_harian %}
+    <table class="table">
+
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Total Penjualan</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in penjualan_harian %}
+            <tr>
+                <td>
+                    {{ row[0] }} {{ bulan_names[bulan|int - 1] }}
+                </td>
+                <td>Rp. {{ "{:,.0f}".format(row[1]) }}</td>
+            </tr>
+            {% endfor %}
+            {% if total_transaksi is not none %}
+            <tr>
+                <td>
+                    <b>Total Transaksi Bulan {{ bulan_names[bulan|int - 1] }} {{ tahun }}</b>
+                </td>
+                <td><b>Rp. {{ "{:,.0f}".format(total_transaksi) }}</b></td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID Transaksi</th>
+                <th>Username</th>
+                <th>Total Harga</th>
+                <th>Bayar</th>
+                <th>Kembali</th>
+                <th>Waktu Transaksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in transaksi_detail %}
+            <tr>
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+                <td>Rp. {{ "{:,.0f}".format(row[2]) }}</td>
+                <td>Rp. {{ "{:,.0f}".format(row[3]) }}</td>
+                <td>Rp. {{ "{:,.0f}".format(row[4]) }}</td>
+                <td>{{ row[5] }}</td>
+            </tr>
+            {% endfor %}
+            {% if total_transaksi is not none %}
+            <tr>
+                <td colspan="1" style="text-align: left;">
+                    <b>Jumlah Penjualan</b>
+                </td>
+                <td colspan="5" style="text-align: right;">
+                    <b>Rp. {{ "{:,.0f}".format(total_transaksi) }}</b>
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {% endif %}
+    <script>
+        window.onload = function () {
+            window.print();
+        }
+    </script>
+</body>
+
+</html>

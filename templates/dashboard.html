@@ -1,0 +1,131 @@
+{% extends 'sidebar.html' %}
+{% block content %}
+<main>
+    <div class="head-title">
+        <div class="left">
+            <h1>Dasbor</h1>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">Dasbor</a>
+                </li>
+                <li><i class="bx bx-chevron-right"></i></li>
+                <li>
+                    <a class="active" href="{{ url_for('dashboard')}}">Beranda</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <ul class="box-info">
+        <li onclick="window.location.href='{{ url_for('daftar_barang') }}'" style="cursor: pointer;">
+            <i class="bx bxs-box"></i>
+            <span class="text">
+                <h3>{{ stok }} PCs</h3>
+                <p>Stok Barang</p>
+            </span>
+        </li>
+        <li onclick="window.location.href='{{ url_for('laporan_penjualan') }}'" style="cursor: pointer;">
+            <i class="bx bxs-dollar-circle"></i>
+            <span class="text">
+                <h3>Rp. {{ omset }}</h3>
+                <p>Jumlah Penjualan</p>
+            </span>
+        </li>
+        <li onclick="window.location.href='{{ url_for('kelola_akun') }}'" style="cursor: pointer;">
+            <i class="bx bxs-group"></i>
+            <span class="text">
+                <h3>{{ akun }}</h3>
+                <p>Akun Tersedia</p>
+            </span>
+        </li>
+    </ul>
+    <a class="icon" href="#" data-bs-toggle="dropdown">Saring<i class="bx bx-caret-down"></i></a>
+    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+        <li class="dropdown-header text-start">
+            <h6>Saring</h6>
+        </li>
+        <li><a class="dropdown-item" href="#" onclick="updateChart('day')">Hari ini</a></li>
+        <li><a class="dropdown-item" href="#" onclick="updateChart('week')">Minggu ini</a></li>
+        <li><a class="dropdown-item" href="#" onclick="updateChart('month')">Bulan ini</a></li>
+        <li><a class="dropdown-item" href="#" onclick="updateChart('year')">Tahun ini</a></li>
+    </ul>
+    <canvas id="salesChart" width="20" height="10"></canvas>
+    <div class="table-data">
+        <div class="order">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama Pengguna</th>
+                        <th>Tabel</th>
+                        <th>Aksi</th>
+                        <th>Waktu</th>
+                        <th><a href="{{ url_for('riwayat') }}" style="text-decoration: none">Lihat Semua</a></th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    {% for history in history %}
+                    <tr>
+                        <td>{{ history[4] }}</td>
+                        <td>{{ history[1] }}</td>
+                        <td>{{ history[2] }}</td>
+                        <td>{{ history[3] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<script src="{{ url_for('static', filename='chart/package/dist/chart.umd.js') }}"></script>
+<script>
+    var labels = {{ bulan | tojson | safe }};
+    var data = {{ penjualan | tojson | safe }};
+    var ctx = document.getElementById('salesChart').getContext('2d');
+    var salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '{{ filter_type | capitalize }} Penjualan',
+                data: data,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    function updateChart(filter_type) {
+        fetch(`/dashboard_data?filter_type=${filter_type}`)
+            .then(response => response.json())
+            .then(data => {
+                salesChart.data.labels = data.labels;
+                salesChart.data.datasets[0].data = data.data;
+                salesChart.data.datasets[0].label = getLabel(filter_type);
+                salesChart.update();
+            })
+            .catch(error => console.error("Error fetching chart data:", error));
+    }
+
+    function getLabel(filter_type) {
+        switch (filter_type) {
+            case 'day': return 'Penjualan Hari Ini';
+            case 'week': return 'Penjualan Minggu Ini';
+            case 'month': return 'Penjualan Bulan Ini';
+            case 'year': return 'Penjualan Tahun Ini';
+            default: return 'Penjualan';
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        updateChart('day');
+    });
+</script>
+
+{% endblock %}

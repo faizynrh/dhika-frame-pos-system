@@ -1,0 +1,84 @@
+<!-- Tambahkan ini di tempat tabel ketika tidak ada data -->
+{% if not transaksi %}
+<div class="no-data-container">
+    <div class="no-data-content">
+        <i class='bx bx-receipt no-data-icon'></i>
+        <h3>Oops! Transaksi Tidak Ditemukan</h3>
+        <p>Coba pilih rentang waktu yang berbeda untuk melihat riwayat transaksi</p>
+        <!-- Ubah button menjadi link -->
+        <div class="no-data-actions">
+            <a href="{{ url_for('laporan_penjualan') }}" class="btn btn-primary">
+                <i class='bx bx-refresh'></i> Reset Filter
+            </a>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Kode tabel yang sudah ada -->
+{% endif %}
+
+<style>
+    .no-data-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .no-data-content {
+        text-align: center;
+        padding: 40px;
+    }
+
+    .no-data-icon {
+        font-size: 80px;
+        color: #ccd6e4;
+        margin-bottom: 20px;
+    }
+
+    .no-data-content h3 {
+        color: #2b3445;
+        font-size: 24px;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .no-data-content p {
+        color: #6c757d;
+        font-size: 16px;
+        max-width: 300px;
+        margin: 0 auto;
+        line-height: 1.5;
+    }
+
+    .no-data-actions {
+        margin-top: 20px;
+    }
+
+    .no-data-actions .btn {
+        padding: 8px 20px;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .no-data-actions .btn i {
+        font-size: 18px;
+    }
+
+    .no-data-actions .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+</style>
+<script>
+    function resetFilter() {
+        // Reload halaman atau panggil fungsi untuk memuat data awal
+        window.location.href = "{{ url_for('laporan_penjualan') }}";
+    }
+</script>

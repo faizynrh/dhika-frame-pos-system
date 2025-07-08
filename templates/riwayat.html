@@ -1,0 +1,130 @@
+{% extends 'sidebar.html' %}
+
+{% block content %}
+<style>
+    .no-data-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .no-data-content {
+        text-align: center;
+        padding: 40px;
+    }
+
+    .no-data-icon {
+        font-size: 80px;
+        color: #ccd6e4;
+        margin-bottom: 20px;
+    }
+
+    .no-data-content h3 {
+        color: #2b3445;
+        font-size: 24px;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .no-data-content p {
+        color: #6c757d;
+        font-size: 16px;
+        max-width: 300px;
+        margin: 0 auto;
+        line-height: 1.5;
+    }
+
+    .no-data-actions {
+        margin-top: 20px;
+    }
+
+    .no-data-actions .btn {
+        padding: 8px 20px;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .no-data-actions .btn i {
+        font-size: 18px;
+    }
+
+    .no-data-actions .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+</style>
+<main>
+    <div class="head-title">
+        <div class="left">
+            <h1>Riwayat Aktivitas</h1>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">Dasbor</a>
+                </li>
+                <li><i class="bx bx-chevron-right"></i></li>
+                <li>
+                    <a class="active" href="{{ url_for('riwayat')}}">Riwayat Transaksi</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Form filter dengan satu tanggal -->
+    <div class="mb-4">
+        <form method="GET" action="{{ url_for('riwayat') }}" style="display: flex; align-items: flex-end; gap: 10px;">
+            <div>
+                <label for="filter_date" class="form-label">Pilih Tanggal:</label>
+                <input type="date" class="form-control" id="filter_date" name="filter_date"
+                    value="{{ request.args.get('filter_date', '') }}" max="{{ today_date }}">
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary">Saring</button>
+                <a href="{{ url_for('riwayat') }}" class="btn btn-secondary">Atur Ulang</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-data">
+        <div class="order">
+            {% if not histories %}
+            <div class="no-data-container">
+                <div class="no-data-content">
+                    <i class='bx bx-history no-data-icon'></i>
+                    <h3>Oops! Riwayat Tidak Ditemukan</h3>
+                    <p>Tidak ada riwayat yang ditemukan untuk tanggal yang dipilih. Silakan coba memilih tanggal lain.
+                    </p>
+                </div>
+            </div>
+            {% else %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Tabel</th>
+                        <th>Aksi</th>
+                        <th>Waktu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for history in histories %}
+                    <tr>
+                        <td>{{ history[4] }}</td>
+                        <td>{{ history[1] }}</td>
+                        <td>{{ history[2] }}</td>
+                        <td>{{ history[3] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock %}

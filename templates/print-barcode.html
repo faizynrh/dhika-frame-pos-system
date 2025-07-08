@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Barcode</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            margin: 20px;
+        }
+
+        .barcode-grid {
+            display: flex;
+            flex-wrap: wrap;
+            /* Membuat elemen barcode berlanjut ke baris berikutnya saat penuh */
+            justify-content: flex-start;
+            gap: 10px;
+            /* Jarak antar barcode */
+        }
+
+        .barcode-item {
+            flex: 1 1 100px;
+            /* Set ukuran minimum barcode */
+            max-width: 200px;
+            /* Batas maksimum ukuran barcode */
+            text-align: center;
+        }
+
+        .barcode-item img {
+            height: 120px;
+        }
+
+        h1 {
+            font-size: 20px;
+            margin-bottom: 40px;
+        }
+
+        /* Print-only styling */
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Barcode Untuk <span id="product-name"></span></h1>
+        <!-- Button to trigger print -->
+        <button class="no-print" onclick="window.print()">Print</button>
+        <div id="barcode-container" class="barcode-grid"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const jumlahBarcode = localStorage.getItem('jumlah_barcode');
+            const namaProduk = localStorage.getItem('nama_produk');
+            const kodeBarang = localStorage.getItem('kode_barang');
+
+            const barcodeUrl = `/generate-barcode-image?kode_barang=${kodeBarang}&nama_produk=${namaProduk}`;
+
+            document.getElementById('product-name').textContent = namaProduk;
+
+            const container = document.getElementById('barcode-container');
+
+            // Loop to create barcode elements
+            for (let i = 0; i < jumlahBarcode; i++) {
+                const barcodeItem = document.createElement('div');
+                barcodeItem.classList.add('barcode-item');
+
+                const barcodeImage = document.createElement('img');
+                barcodeImage.src = `${barcodeUrl}&_=${new Date().getTime()}`; // Menambahkan cache buster
+                barcodeImage.alt = `Barcode for ${kodeBarang}`;
+
+                console.log(`Loading barcode image from: ${barcodeImage.src}`);  // Debugging log
+
+                // Removed kodeBarangText creation and appending
+                // const kodeBarangText = document.createElement('p');
+                // kodeBarangText.textContent = kodeBarang;
+
+                barcodeItem.appendChild(barcodeImage);
+                // barcodeItem.appendChild(kodeBarangText); // This line is removed
+
+                container.appendChild(barcodeItem);
+            }
+        });
+    </script>
+</body>
+
+</html>

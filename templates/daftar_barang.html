@@ -1,0 +1,524 @@
+{% extends 'sidebar.html' %} {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="container">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+<style>
+    .texttr {
+        cursor: pointer;
+        color: black;
+        font-weight: 500;
+    }
+</style>
+<!-- MAIN -->
+<main>
+    <div class="head-title">
+        <div class="left">
+            <h1>Daftar Barang</h1>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">Dasbor</a>
+                </li>
+                <li><i class="bx bx-chevron-right"></i></li>
+                <li>
+                    <a class="active" href="{{ url_for('daftar_barang')}}">Daftar Barang</a>
+                </li>
+            </ul>
+        </div>
+        <a class="btn-download" href="{{ url_for('laporan_barang') }}" target="_blank">
+            <i class="bx bxs-cloud-download"></i>
+            <span class="text">Unduh Laporan Barang</span>
+        </a>
+    </div>
+    <div class="table-data">
+        <div class="order">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <button class="btn btn-primary" data-bs-target="#inputbarang" data-bs-toggle="modal" type="button">
+                    + Tambah Barang
+                </button>
+                <form id="searchForm" class="d-flex align-items-center">
+                    <div class="input-group">
+                        <input class="form-control" id="searchInput" type="search" aria-label="Search"
+                            placeholder="Cari barang..." style="max-width: 200px;">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bx bx-search"></i> Cari
+                        </button>
+                    </div>
+                    <button class="btn btn-secondary ms-2" id="resetSearch" type="button">
+                        <i class="bx bx-reset"></i> Reset
+                    </button>
+                </form>
+            </div>
+            <small class="text-muted d-block mb-2">
+                *tekan pada nama produk untuk melihat detail
+            </small>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Produk</th>
+                        <th>Deskripsi</th>
+                        <th>Stok</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produk in produk %}
+                    <tr>
+                        <td>{{ loop.index }}</td> <!-- Menampilkan nomor urut -->
+                        <td class="clickable-row texttr" data-deskripsi="{{ produk[4] }}" data-harga="{{ produk[5] }}"
+                            data-id="{{ produk[0] }}" data-kategori="{{ produk[7] }}" data-kode="{{ produk[1] }}"
+                            data-nama="{{ produk[2] }}" data-stok="{{ produk[6] }}">
+                            {{ produk[2] }}
+                        </td>
+                        <td>{{ produk[4]|truncate(25, True, '...') }}</td> <!-- Deskripsi -->
+                        <td>
+                            {% if produk[6] <= 10 %} <span style="color: red;">{{ produk[6] }}</span>
+                                {% else %}
+                                <span>{{ produk[6] }}</span>
+                                {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-primary product-info" data-bs-target="#tambahStokModal"
+                                data-bs-toggle="modal" data-id="{{ produk[0] }}" data-kode="{{ produk[1] }}"
+                                data-nama="{{ produk[2] }}" data-stok="{{ produk[6] }}">+Stok</button>
+                            <button class="btn btn-warning" data-bs-target="#editbarang" data-bs-toggle="modal"
+                                data-deskripsi="{{ produk[4] }}" data-harga="{{ produk[5] }}" data-id="{{ produk[0] }}"
+                                data-kategori="{{ produk[3] }}" data-kode="{{ produk[1] }}" data-nama="{{ produk[2] }}"
+                                data-stok="{{ produk[6] }}" type="button">
+                                Ubah
+                            </button>
+                            <button class="btn btn-danger" data-bs-target="#hapusbarang" data-bs-toggle="modal"
+                                data-id="{{ produk[0] }}" type="button">
+                                Hapus
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<!-- Modal untuk Menambah Stok -->
+<div class="modal fade" id="tambahStokModal" aria-hidden="true" aria-labelledby="tambahStokModalLabel" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/tambah_stok" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tambahStokModalLabel">Tambah Stok Produk</h5>
+                    <button class="btn-close" data-bs-dismiss="modal" type="button" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="stok-modal-id" name="id" type="hidden">
+                    <p>Nama Produk: <span id="stok-modal-nama"></span></p>
+                    <p>Stok Saat Ini: <span id="stok-modal-saat-ini"></span></p>
+                    <div class="mb-3">
+                        <label class="form-label" for="stokBaru">Jumlah Stok yang Akan Ditambah</label>
+                        <input class="form-control" id="stokBaru" name="tambah_stok" type="number"
+                            placeholder="Masukkan jumlah stok" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Batal</button>
+                    <button class="btn btn-primary" type="submit">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Edit -->
+<div class="modal fade" id="editbarang" aria-hidden="true" aria-labelledby="editbarang" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Produk</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button" aria-label="Close"></button>
+            </div>
+            <form id="editProductForm" method="post" action="">
+                <div class=" modal-body">
+                    <!-- Nama Produk -->
+                    <div class="mb-3">
+                        <label class="form-label" for="edit_nama_produk">Nama Produk</label>
+                        <input class="form-control" id="edit_nama_produk" name="nama_produk" type="text" required>
+                    </div>
+                    <!-- Kategori -->
+                    <div class="mb-3">
+                        <label class="form-label" for="edit_kategori_id">Kategori</label>
+                        <select class="form-select" id="edit_kategori_id" name="kategori_id" required>
+                            <option value disabled selected>Pilih kategori</option>
+                            {% for kategori in kategori %}
+                            <option value="{{ kategori[0] }}">{{ kategori[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Deskripsi -->
+                    <div class="mb-3">
+                        <label class="form-label" for="edit_deskripsi">Deskripsi</label>
+                        <textarea class="form-control" id="edit_deskripsi" name="deskripsi" rows="3"
+                            required></textarea>
+                    </div>
+                    <!-- Harga -->
+                    <div class="mb-3">
+                        <label class="form-label" for="edit_harga">Harga</label>
+                        <input class="form-control" id="edit_harga" name="harga" type="number" min="1" required>
+                    </div>
+                    <!-- Stok -->
+                    <input class="form-control" id="edit_stok" name="stok" type="hidden" readonly>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Batal</button>
+                    <button class="btn btn-primary" type="submit">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Insert -->
+<!-- Modal Insert -->
+<div class="modal fade" id="inputbarang" aria-hidden="true" aria-labelledby="inputbarang" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inputModalLabel">Tambah Produk</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button" aria-label="Close"></button>
+            </div>
+            <form id="productForm" method="post" action="{{ url_for('tambah_barang') }}">
+                <div class="modal-body">
+                    <!-- Nama Produk -->
+                    <div class="mb-3">
+                        <button class="btn btn-primary" id="generateCode" type="button">Buat Kode</button>
+                        <label class="form-label" for="kode_barang">Kode Barang</label>
+                        <input class="form-control" id="kode_barang" name="kode_barang" type="text" required
+                            maxlength="12">
+                        <div id="error-message" style="color: red; display: none;">Kode barang harus tepat 12 angka!
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="nama_produk">Nama Produk</label>
+                        <input class="form-control" id="nama_produk" name="nama_produk" type="text" required>
+                    </div>
+                    <!-- Kategori -->
+                    <div class="mb-3">
+                        <label class="form-label" for="kategori_id">Kategori</label>
+                        <select class="form-select" id="kategori_id" name="kategori_id" required>
+                            <option value disabled selected>Pilih kategori</option>
+                            {% for kategori in kategori %}
+                            <option value="{{ kategori[0] }}">{{ kategori[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Deskripsi -->
+                    <div class="mb-3">
+                        <label class="form-label" for="deskripsi">Deskripsi</label>
+                        <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" required></textarea>
+                    </div>
+
+                    <!-- Harga -->
+                    <div class="mb-3">
+                        <label class="form-label" for="harga">Harga</label>
+                        <input class="form-control" id="harga" name="harga" type="number" min="1" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Batal</button>
+                    <button class="btn btn-primary" type="submit">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Hapus -->
+<div class="modal fade" id="hapusbarang" aria-hidden="true" aria-labelledby="exampleModalLabel" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Konfirmasi Penghapusan</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Apakah Anda yakin ingin menghapus produk ini?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Batal</button>
+                <!-- Form untuk menghapus produk -->
+                <form id="hapusForm" action method="POST" style="display:inline;">
+                    <button class="btn btn-danger" type="submit">Hapus</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="detailModal" aria-hidden="true" aria-labelledby="detailModalLabel" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalLabel">Detail Barang</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">Informasi Produk</h6>
+                            <p><strong>Nama:</strong> <span id="modal-nama"></span></p>
+                            <p><strong>Kategori:</strong> <span id="modal-kategori"></span></p>
+                            <p><strong>Harga:</strong> <span id="modal-harga"></span></p>
+                            <p><strong>Stok:</strong> <span id="modal-stok"></span></p>
+                            <p class="d-none"><strong>Kode Barang:</strong> <span id="modal-kode"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">Deskripsi</h6>
+                            <p id="modal-deskripsi"></p>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12 text-center">
+                            <h6 class="fw-bold mb-3">Barcode</h6>
+                            <img class="img-fluid mb-2" id="modal-barcode" src alt="Barcode Produk"
+                                style="max-width: 150px; height: auto;">
+                            <p id="modal-kode-barang" class="fw-bold"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btn-print-barcode" type="button">
+                    <i class="bi bi-printer"></i> Cetak Barcode
+                </button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal untuk Input Jumlah Barcode -->
+<div class="modal fade" id="modal-input-jumlah" aria-hidden="true" aria-labelledby="modalInputJumlahLabel"
+    tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalInputJumlahLabel">Input Jumlah Barcode</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label" for="jumlah-barcode">Jumlah Barcode:</label>
+                <input class="form-control" id="jumlah-barcode" type="number" min="1" value="1">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btn-print" type="button">Print</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('hapusbarang');
+    modal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget; // tombol yang mengaktifkan modal
+        const produkId = button.getAttribute('data-id'); // ambil data-id dari tombol
+        const form = modal.querySelector('#hapusForm');
+        form.action = `/hapus_produk/${produkId}`; // isi action dengan ID produk
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const editModal = document.getElementById('editbarang');
+
+        // Event listener untuk tombol Edit
+        editModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget; // Tombol yang mengaktifkan modal
+            const produkId = button.getAttribute('data-id'); // Ambil data-id dari tombol
+            const namaProduk = button.getAttribute('data-nama');
+            const kategoriId = button.getAttribute('data-kategori');
+            const deskripsi = button.getAttribute('data-deskripsi');
+            const harga = button.getAttribute('data-harga');
+            const stok = button.getAttribute('data-stok');
+
+            // Isi form dengan data yang diambil
+            const modalForm = editModal.querySelector('form');
+            modalForm.action = `/edit_produk/${produkId}`;
+            modalForm.querySelector('#edit_nama_produk').value = namaProduk;
+            modalForm.querySelector('#edit_kategori_id').value = kategoriId;
+            modalForm.querySelector('#edit_deskripsi').value = deskripsi;
+            modalForm.querySelector('#edit_harga').value = harga;
+            modalForm.querySelector('#edit_stok').value = stok;
+        });
+
+        const rows = document.querySelectorAll('.clickable-row');
+
+        rows.forEach(row => {
+            row.addEventListener('click', function () {
+                const produkId = this.getAttribute('data-id'); // Ambil ID produk
+                const kode = this.getAttribute('data-kode');
+                const nama = this.getAttribute('data-nama');
+                const kategori = this.getAttribute('data-kategori');
+                const deskripsi = this.getAttribute('data-deskripsi');
+                const harga = this.getAttribute('data-harga');
+                const stok = this.getAttribute('data-stok');
+
+                // Masukkan data ke dalam modal
+                document.getElementById('modal-nama').textContent = nama;
+                document.getElementById('modal-kategori').textContent = kategori;
+                document.getElementById('modal-deskripsi').textContent = deskripsi;
+                document.getElementById('modal-harga').textContent = 'Rp. ' + harga;
+                document.getElementById('modal-stok').textContent = stok;
+                document.getElementById('modal-kode').textContent = kode;
+                document.getElementById('modal-kode-barang').textContent = kode; // Menampilkan kode barang di bawah barcode
+
+                // Meminta barcode dari server menggunakan produkId
+                const barcodeImage = document.getElementById('modal-barcode');
+                fetch(`/generate-barcode?id=${encodeURIComponent(produkId)}`) // Menggunakan ID produk
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok: ' + response.statusText);
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        const barcodeUrl = URL.createObjectURL(blob);
+                        barcodeImage.src = barcodeUrl; // Tampilkan barcode di dalam modal
+                    })
+                    .catch(error => console.error('Error fetching barcode:', error));
+
+                // Tampilkan modal
+                var modalDetail = new bootstrap.Modal(document.getElementById('detailModal'));
+                modalDetail.show();
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchForm = document.getElementById('searchForm');
+        const resetButton = document.getElementById('resetSearch');
+
+        searchForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const query = document.getElementById('searchInput').value;
+            window.location.href = `/daftar_barang?query=${encodeURIComponent(query)}`;
+        });
+
+        resetButton.addEventListener('click', function () {
+            document.getElementById('searchInput').value = '';
+            window.location.href = '/daftar_barang';
+        });
+    });
+    function generateRandomCode() {
+        let code = '';
+        for (let i = 0; i < 12; i++) {
+            code += Math.floor(Math.random() * 10);
+        }
+        return code;
+    }
+
+    // Fungsi untuk memeriksa apakah kode sudah ada di database
+    async function checkCodeExists(code) {
+        const response = await fetch('/cek_kode_barang', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `kode_barang=${code}`
+        });
+        const data = await response.json();
+        return data.exists;
+    }
+
+    document.getElementById('generateCode').addEventListener('click', async function (event) {
+        event.preventDefault(); // Mencegah form submit
+        let code;
+        do {
+            code = generateRandomCode();
+        } while (await checkCodeExists(code)); // Cek jika kode sudah ada
+
+        document.getElementById('kode_barang').value = code; // Set kode ke input
+    });
+
+    document.querySelectorAll('.product-info').forEach(function (element) {
+        element.addEventListener('click', function () {
+            const produkId = this.getAttribute('data-id');
+            const nama = this.getAttribute('data-nama');
+            const stok = this.getAttribute('data-stok');
+
+            document.getElementById('stok-modal-id').value = produkId;
+            document.getElementById('stok-modal-nama').innerText = nama;
+            document.getElementById('stok-modal-saat-ini').innerText = stok;
+        });
+    });
+
+    // Ubah event listener btn-print menjadi seperti ini
+    document.getElementById('btn-print').addEventListener('click', function () {
+        const jumlahBarcode = document.getElementById('jumlah-barcode').value;
+        const nama = document.getElementById('modal-nama').textContent;
+        const kode = document.getElementById('modal-kode').textContent;
+
+        // Ambil barcode dari server
+        fetch(`/generate-barcode-image?kode_barang=${kode}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+
+                // Simpan data di localStorage untuk digunakan di halaman print
+                localStorage.setItem('jumlah_barcode', jumlahBarcode);
+                localStorage.setItem('nama_produk', nama);
+                localStorage.setItem('kode_barang', kode);
+                localStorage.setItem('barcode_url', url);
+
+                // Buka halaman print di tab baru
+                window.open('/print-barcode', '_blank');
+
+                // Tutup modal input jumlah
+                const modalInputJumlah = bootstrap.Modal.getInstance(document.getElementById('modal-input-jumlah'));
+                modalInputJumlah.hide();
+            })
+            .catch(error => console.error('Error fetching barcode:', error));
+    });
+
+    // Event listener untuk modal input jumlah barcode
+    document.getElementById('modal-input-jumlah').addEventListener('show.bs.modal', function () {
+        // Tutup modal detail jika terbuka
+        const detailModal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+        if (detailModal) {
+            detailModal.hide();
+        }
+    });
+    document.getElementById('btn-print-barcode').addEventListener('click', function () {
+        // Ambil data yang diperlukan dari modal detail
+        const nama = document.getElementById('modal-nama').textContent;
+        const kode = document.getElementById('modal-kode').textContent;
+
+        // Simpan data di localStorage untuk digunakan di modal input jumlah
+        localStorage.setItem('nama_produk', nama);
+        localStorage.setItem('kode_barang', kode);
+
+        // Reset jumlah barcode ke 1 setiap kali modal dibuka
+        const jumlahBarcodeInput = document.getElementById('jumlah-barcode');
+        jumlahBarcodeInput.value = 1;
+
+        // Tutup modal detail
+        const modalDetail = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+        modalDetail.hide();
+
+        // Buka modal input jumlah barcode
+        const modalInputJumlah = new bootstrap.Modal(document.getElementById('modal-input-jumlah'));
+        modalInputJumlah.show();
+    });
+
+</script>
+
+{% endblock %}

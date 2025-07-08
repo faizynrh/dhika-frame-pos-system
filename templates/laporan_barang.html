@@ -1,0 +1,224 @@
+<main>
+    <div class="report-container">
+        <div class="report-header">
+            <h2 class="company-name">DHIKA FRAME</h2>
+            <p class="company-address">
+                Kp Citaman, RT.04/RW.18, Cigugur Tengah, Kec. Cimahi Tengah,<br>
+                Kota Cimahi, Jawa Barat 40522
+            </p>
+            <hr>
+            <div class="report-title">
+                <h3>Nama Laporan : Laporan Stok Barang</h3>
+                <p>Periode : {{ now().strftime('%d %B %Y') }}</p>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%">Kode Barang</th>
+                        <th style="width: 35%">Nama Barang</th>
+                        <th style="width: 20%">Kategori</th>
+                        <th style="width: 20%">Harga</th>
+                        <th style="width: 10%">Stok</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in barang %}
+                    <tr>
+                        <td>{{ item[1] }}</td>
+                        <td>{{ item[2] }}</td>
+                        <td>{{ item[7] }}</td>
+                        <td>Rp. {{ "{:,.0f}".format(item[5]) }}</td>
+                        <td class="{% if item[6] <= 10 %}low-stock{% endif %}">{{ item[6] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<style>
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        table-layout: fixed;
+    }
+
+    .report-table th,
+    .report-table td {
+        border: 1px solid #000;
+        padding: 8px;
+        text-align: left;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .report-table th {
+        background-color: #f2f2f2;
+    }
+
+    .report-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .low-stock {
+        color: red;
+        font-weight: bold;
+    }
+
+    .report-container {
+        padding: 20px;
+        background: white;
+        margin: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .report-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .company-name {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .company-address {
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+
+    .report-title {
+        margin-top: 20px;
+    }
+
+    hr {
+        border: none;
+        border-top: 2px solid #000;
+        margin: 20px 0;
+    }
+
+    .print-button {
+        margin: 20px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        table-layout: fixed;
+        /* Penting untuk mengatur lebar kolom */
+        border: 1px solid #000;
+    }
+
+    .report-table th,
+    .report-table td {
+        border: 1px solid #000;
+        padding: 8px;
+        text-align: left;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Khusus untuk kolom stok, atur text-align ke right */
+    .report-table th:last-child,
+    .report-table td:last-child {
+        text-align: right;
+        padding-right: 15px;
+    }
+
+    @media print {
+        .print-button {
+            display: none;
+        }
+
+        .report-table {
+            width: 100% !important;
+            table-layout: fixed !important;
+        }
+
+        .report-table th,
+        .report-table td {
+            padding: 5px !important;
+            font-size: 12px !important;
+        }
+
+        /* Mempertahankan proporsi kolom saat print */
+        .report-table th:nth-child(1) {
+            width: 15% !important;
+        }
+
+        .report-table th:nth-child(2) {
+            width: 35% !important;
+        }
+
+        .report-table th:nth-child(3) {
+            width: 20% !important;
+        }
+
+        .report-table th:nth-child(4) {
+            width: 20% !important;
+        }
+
+        .report-table th:nth-child(5) {
+            width: 10% !important;
+        }
+
+        .report-table thead {
+            display: table-header-group;
+        }
+
+        .report-table tbody {
+            display: table-row-group;
+        }
+
+        .report-table tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        .low-stock {
+            color: red !important;
+            font-weight: bold !important;
+        }
+
+        /* Tambahkan ini untuk memastikan semua border tercetak */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+
+    }
+</style>
+
+<button class="print-button" onclick="window.print()">
+    <i class="bx bx-printer"></i> Print Laporan
+</button>
+
+<script>
+    window.onload = function () {
+        window.print();
+    }
+</script>

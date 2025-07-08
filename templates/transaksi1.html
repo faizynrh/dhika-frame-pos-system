@@ -1,0 +1,151 @@
+{% extends 'sidebar.html' %}
+
+{% block content %}
+
+<!-- MAIN -->
+<main style="overflow: hidden;">
+    <div class="container-fluid">
+        <!-- First Row: Transaction and Cart -->
+        <div class="row mb-4">
+            <!-- Transaction Section (Left) -->
+            <div class="col-lg-5">
+                <div class="card p-1">
+                    <!-- <h6 class="mb-2 small">Transaksi</h6> -->
+                    <!-- Form untuk Simpan Order -->
+                    <form method="POST" action="{{ url_for('tambah_transaksi') }}">
+                        <table class="table table-borderless table-sm">
+                            <tr>
+                                <td class="small">ID Transaksi</td>
+                                <td class="small">:</td>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm" name="id_transaksi"
+                                        id="id_transaksi" placeholder="Ord-270688" readonly
+                                        style="font-size: 0.8rem; padding: 0.25rem;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="small">Total</td>
+                                <td class="small">:</td>
+                                <td>
+                                    <input type="number" name="total" class="form-control form-control-sm" id="total"
+                                        value="{{ total }}" readonly style="font-size: 0.8rem; padding: 0.25rem;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="small">Bayar</td>
+                                <td class="small">:</td>
+                                <td>
+                                    <input type="number" name="bayar" class="form-control form-control-sm" id="bayar"
+                                        style="font-size: 0.8rem; padding: 0.25rem;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="small">Kembali</td>
+                                <td class="small">:</td>
+                                <td>
+                                    <input type="number" name="kembali" class="form-control form-control-sm"
+                                        id="kembali" placeholder="1" readonly
+                                        style="font-size: 0.8rem; padding: 0.25rem;">
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="d-flex justify-content-end mt-1">
+                            <button type="submit" class="btn btn-success">Simpan Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Cart Section (Right) -->
+            <div class="col-lg-7">
+                <div class="card p-1"> <!-- Adjusted padding to match the form section -->
+                    <!-- <h5 class="mb-2 small">Keranjang</h5> Make heading consistent -->
+                    <table class="table table-sm"> <!-- Added 'table-sm' for consistency -->
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Produk</th>
+                                <th>Qty</th>
+                                <th>Sub Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for keranjang in keranjang %}
+                            <tr>
+                                <td>{{ loop.index }}</td> <!-- Menampilkan nomor urut -->
+                                <td>{{ keranjang[6] }}</td> <!-- Menampilkan nama produk -->
+                                <td>{{ keranjang[4] }}</td> <!-- Harga -->
+                                <td>{{ keranjang[5] }}</td> <!-- Jumlah -->
+                                <td>
+                                    <form action="{{ url_for('hapuskeranjang', id=keranjang[0]) }}" method="POST"
+                                        style="display:inline;">
+                                        <button type="submit" class="btn btn-danger" data-qty="{{ keranjang[4] }}"
+                                            onclick="return confirmDelete(this);">-</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card p-4" style="overflow-y: auto; max-height: 300px">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Produk</th>
+                                    <th>Deskripsi</th>
+                                    <th>Harga</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for produk in produk %}
+                                <tr>
+                                    <td>{{ loop.index }}</td> <!-- Menampilkan nomor urut -->
+                                    <td>{{ produk[2] }}</td> <!-- Nama Produk -->
+                                    <td>{{ produk[4]|truncate(15, True, '...') }}</td> <!-- Deskripsi -->
+                                    <td>Rp. {{ produk[5] }}</td> <!-- Harga -->
+                                    <td>
+                                        <form action="{{ url_for('keranjang') }}" method="POST">
+                                            <input type="hidden" name="produk_id" value="{{ produk[0] }}">
+                                            <!-- Assume produk[3] is produk_id -->
+                                            <input type="hidden" name="harga" value="{{ produk[5] }}">
+                                            <input type="hidden" name="username" value="{{ session.get('username') }}">
+                                            <!-- Get user_id from session -->
+                                            <input type="hidden" name="jumlah" value="1">
+                                            <button type="submit" class="btn btn-primary btn-sm w-75">Tambah</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    document.getElementById('bayar').addEventListener('input', function () {
+        var total = parseFloat(document.getElementById('total').value) || 0;
+        var bayar = parseFloat(this.value) || 0;
+        var kembali = bayar - total;
+
+        document.getElementById('kembali').value = kembali >= 0 ? kembali : 0;
+    });
+    function confirmDelete(button) {
+        var qty = button.getAttribute('data-qty');
+        if (qty == 1) {
+            return confirm('Apakah Anda yakin ingin menghapus item ini?');
+        }
+        // Jika qty lebih dari 1, tidak ada konfirmasi
+        return true;
+    }
+</script>
+{% endblock %}

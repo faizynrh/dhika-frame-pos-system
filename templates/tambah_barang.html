@@ -1,0 +1,34 @@
+<main>
+    <form action="{{ url_for('daftar_barang') }}" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="nama_produk" class="form-label">Nama Produk</label>
+            <input type="text" class="form-control" id="nama_produk" name="nama_produk" required>
+        </div>
+        <div class="mb-3">
+            <label for="kategori_id" class="form-label">Kategori</label>
+            <select class="form-select" id="kategori_id" name="kategori_id" required>
+                <option value="">Pilih Kategori</option>
+                {% for kategori in kategori %}
+                <option value="{{ kategori[0] }}">{{ kategori[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="deskripsi" class="form-label">Deskripsi</label>
+            <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="harga" class="form-label">Harga</label>
+            <input type="number" class="form-control" id="harga" name="harga" required>
+        </div>
+        <div class="mb-3">
+            <label for="stok" class="form-label">Stok</label>
+            <input type="number" class="form-control" id="stok" name="stok" required>
+        </div>
+        <div class="mb-3">
+            <label for="gambar" class="form-label">Gambar</label>
+            <input type="file" class="form-control" id="gambar" name="gambar">
+        </div>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+    </form>
+</main>

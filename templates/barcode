@@ -1,0 +1,61 @@
+document.getElementById('toggleBarcodeMode').addEventListener('click', function () {
+    const rows = document.querySelectorAll('.barcode-row');
+    rows.forEach(row => {
+        const actionButtons = row.querySelector('.action-buttons');
+
+        // Sembunyikan tombol Edit dan Hapus, dan tambahkan checkbox
+        if (!row.querySelector('.barcode-checkbox')) {
+            if (actionButtons) {
+                actionButtons.style.display = 'none'; // Sembunyikan tombol aksi
+            }
+            const checkboxCell = document.createElement('td');
+            checkboxCell.innerHTML = `<input type="checkbox" class="barcode-checkbox" data-kode="${row.getAttribute('data-kode')}" data-nama="${row.getAttribute('data-nama')}">`;
+            row.appendChild(checkboxCell); // Tambahkan checkbox
+        } else {
+            // Jika sudah ada checkbox, hapus checkbox dan tampilkan kembali tombol aksi
+            row.querySelector('.barcode-checkbox').parentNode.remove();
+            if (actionButtons) {
+                actionButtons.style.display = 'block'; // Tampilkan tombol aksi
+            }
+        }
+    });
+
+    // Ganti teks tombol sesuai status mode
+    this.textContent = this.textContent === 'Pilih untuk Cetak Barcode' ? 'Batal' : 'Pilih untuk Cetak Barcode';
+
+    // Sembunyikan atau tampilkan tombol cetak barcode
+    document.getElementById('printBarcodeButton').style.display = this.textContent === 'Batal' ? 'block' : 'none';
+});
+
+// Event listener untuk tombol cetak barcode
+document.getElementById('printBarcodeButton').addEventListener('click', function () {
+    const selectedProducts = Array.from(document.querySelectorAll('.barcode-checkbox:checked'))
+        .map(checkbox => ({ kode: checkbox.getAttribute('data-kode'), nama: checkbox.getAttribute('data-nama') }));
+
+    if (selectedProducts.length === 0) {
+        alert("Silakan pilih produk untuk mencetak barcode.");
+        return;
+    }
+
+    const barcodeWindow = window.open('', 'Print Barcode', 'height=600,width=800');
+    barcodeWindow.document.write('<html><head><title>Cetak Barcode</title></head><body>');
+
+    selectedProducts.forEach(product => {
+        barcodeWindow.document.write(`<div style="text-align: center; margin-bottom: 20px;">
+            <img src="/generate-barcode?kode=${product.kode}" alt="Barcode untuk ${product.kode}">
+            <div>${product.nama}</div>
+        </div>`);
+    });
+
+    barcodeWindow.document.write('</body></html>');
+    barcodeWindow.document.close();
+    barcodeWindow.print();
+});
+
+
+    < !--Tombol untuk Memulai Mode Pilih Barcode-- >
+            <button type="button" id="toggleBarcodeMode" class="btn btn-primary">Pilih untuk Cetak Barcode</button>
+            <button type="button" id="printBarcodeButton" class="btn btn-success" style="display:none;">Cetak
+                Barcode</button>
+
+                    <tr class="barcode-row" data-kode="{{ produk[1] }}" data-nama="{{ produk[2] }}">

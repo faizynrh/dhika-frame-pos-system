@@ -1,0 +1,138 @@
+{% extends 'sidebar.html' %} {% block content %}
+<!-- <link href="{{ url_for('static', filename='bs/css/bootstrap.min.css') }}" rel="stylesheet"> -->
+
+<!-- MAIN -->
+<main>
+    <div class="head-title">
+        <div class="left">
+            <h1>Daftar Barang</h1>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">Dashboard</a>
+                </li>
+                <li><i class='bx bx-chevron-right'></i></li>
+                <li>
+                    <a class="active" href="#">Home</a>
+                </li>
+            </ul>
+        </div>
+        <a href="#" class="btn-download">
+            <i class='bx bxs-cloud-download'></i>
+            <span class="text">Download PDF</span>
+        </a>
+    </div>
+
+    <!-- <ul class="box-info">
+                <li>
+                    <i class='bx bxs-calendar-check'></i>
+                    <span class="text">
+                        <h3>1020</h3>
+                        <p>New Order</p>
+                    </span>
+                </li>
+                <li>
+                    <i class='bx bxs-group'></i>
+                    <span class="text">
+                        <h3>2834</h3>
+                        <p>Visitors</p>
+                    </span>
+                </li>
+                <li>
+                    <i class='bx bxs-dollar-circle'></i>
+                    <span class="text">
+                        <h3>$2543</h3>
+                        <p>Total Sales</p>
+                    </span>
+                </li>
+            </ul> -->
+
+
+    <div class="table-data">
+        <div class="order">
+            <div class="head">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#tambahProdukModal">
+                    + Tambah Data
+                </button>
+            </div>
+
+            <!-- Modal untuk Tambah Produk -->
+            <div class="modal fade" id="tambahProdukModal" tabindex="-1" aria-labelledby="tambahProdukModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="tambahProdukModalLabel">Tambah Produk Baru</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{{ url_for('daftar_barang') }}" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="nama_produk" class="form-label">Nama Produk</label>
+                                    <input type="text" class="form-control" id="nama_produk" name="nama_produk"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="kategori_id" class="form-label">Kategori</label>
+                                    <select class="form-select" id="kategori_id" name="kategori_id" required>
+                                        <option value="">Pilih Kategori</option>
+                                        {% for kategori in kategori %}
+                                        <option value="{{ kategori[0] }}">{{ kategori[1] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="deskripsi" class="form-label">Deskripsi</label>
+                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3"
+                                        required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="harga" class="form-label">Harga</label>
+                                    <input type="number" class="form-control" id="harga" name="harga" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="stok" class="form-label">Stok</label>
+                                    <input type="number" class="form-control" id="stok" name="stok" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="gambar" class="form-label">Gambar</label>
+                                    <input type="file" class="form-control" id="gambar" name="gambar">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Data Produk -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Produk</th>
+                        <th>Kategori</th>
+                        <th>Deskripsi</th>
+                        <th>Harga</th>
+                        <th>Stok</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produk in produk %}
+                    <tr>
+                        <td>{{ loop.index }}</td> <!-- Menampilkan nomor urut -->
+                        <td>{{ produk[1] }}</td> <!-- Nama Produk -->
+                        <td>{{ produk[2] }}</td> <!-- Kategori -->
+                        <td>{{ produk[3] }}</td> <!-- Deskripsi -->
+                        <td>{{ produk[4] }}</td> <!-- Harga -->
+                        <td>{{ produk[5] }}</td> <!-- Stok -->
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+<!-- MAIN -->
+{% endblock %}

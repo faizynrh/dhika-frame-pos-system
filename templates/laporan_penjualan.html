@@ -1,0 +1,351 @@
+{% extends 'sidebar.html' %}
+
+{% block content %}
+<main>
+    <div class="head-title">
+        <div class="left">
+            <h1>Laporan Penjualan</h1>
+            <ul class="breadcrumb">
+                <li><a href="#">Dasbor</a></li>
+                <li><i class="bx bx-chevron-right"></i></li>
+                <li><a class="active" href="{{ url_for('laporan_penjualan')}}">Laporan Penjualan</a></li>
+            </ul>
+        </div>
+        <a id="btn-download" class="btn-download" href="#" target="_blank">
+            <i class="bx bxs-cloud-download"></i>
+            <span class="text">Unduh Laporan Penjualan</span>
+        </a>
+    </div>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="filterType" id="filterType1"
+                        onclick="toggleForms()" checked>
+                    <label class="form-check-label" for="filterType1">
+                        Pilih berdasarkan Tahun/Bulan/Tanggal
+                    </label>
+                </div>
+                <div class="filter-section" id="form1-fieldset">
+                    <form id="filter-form" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="tahun" class="form-label">Tahun:</label>
+                            <select name="tahun" id="tahun" class="form-select" required>
+                                <option value="">Pilih Tahun</option>
+                                {% for year in range(2024, current_year + 1) %}
+                                <option value="{{ year }}">{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="bulan" class="form-label">Bulan:</label>
+                            <select name="bulan" id="bulan" class="form-select">
+                                <option value="">Pilih Bulan</option>
+                                {% for month in range(1, 13) %}
+                                <option value="{{ '%02d' | format(month) }}">{{ month }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tanggal" class="form-label">Tanggal:</label>
+                            <select name="tanggal" id="tanggal" class="form-select">
+                                <option value="">Pilih Tanggal</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Saring</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="filterType" id="filterType2"
+                        onclick="toggleForms()">
+                    <label class="form-check-label" for="filterType2">
+                        Pilih berdasarkan Rentang Tanggal
+                    </label>
+                </div>
+                <div class="filter-section" id="form2-fieldset">
+                    <form id="filter-range" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="start-date" class="form-label">Dari Tanggal:</label>
+                            <input type="date" id="start-date" name="start-date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end-date" class="form-label">Ke Tanggal:</label>
+                            <input type="date" id="end-date" name="end-date" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Saring </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleForms() {
+            const form1Fieldset = document.getElementById("form1-fieldset");
+            const form2Fieldset = document.getElementById("form2-fieldset");
+            const radio1 = document.getElementById("filterType1");
+            const radio2 = document.getElementById("filterType2");
+            const filterBtn1 = form1Fieldset.querySelector("button[type='submit']");
+            const filterBtn2 = form2Fieldset.querySelector("button[type='submit']");
+
+            if (radio1.checked) {
+                form1Fieldset.disabled = false;
+                form2Fieldset.disabled = true;
+                filterBtn1.disabled = false;
+                filterBtn2.disabled = true;
+                // Reset form 2
+                document.getElementById('filter-range').reset();
+            } else if (radio2.checked) {
+                form1Fieldset.disabled = true;
+                form2Fieldset.disabled = false;
+                filterBtn1.disabled = true;
+                filterBtn2.disabled = false;
+                // Reset form 1
+                document.getElementById('filter-form').reset();
+                document.getElementById('bulan').disabled = true;
+                document.getElementById('tanggal').disabled = true;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Inisialisasi status tombol saat halaman dimuat
+            const filterBtn1 = document.querySelector("#form1-fieldset button[type='submit']");
+            const filterBtn2 = document.querySelector("#form2-fieldset button[type='submit']");
+
+            // Set status awal berdasarkan radio button yang checked
+            if (document.getElementById("filterType1").checked) {
+                filterBtn2.disabled = true;
+            } else if (document.getElementById("filterType2").checked) {
+                filterBtn1.disabled = true;
+            }
+
+            // Panggil toggleForms untuk inisialisasi
+            toggleForms();
+
+            // Sisa kode JavaScript Anda tetap sama...
+        });
+    </script>
+
+
+
+    <div class="table-data">
+        <div class="order">
+            <div id="table-container">
+                {% if transaksi %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Transaksi</th>
+                            <th>Username</th>
+                            <th>Total Harga</th>
+                            <th>Bayar</th>
+                            <th>Kembali</th>
+                            <th>Waktu Transaksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in transaksi %}
+                        <tr>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[7] }}</td>
+                            <td>Rp. {{ "{:,.0f}".format(row[3]) }}</td>
+                            <td>Rp. {{ "{:,.0f}".format(row[4]) }}</td>
+                            <td>Rp. {{ "{:,.0f}".format(row[5]) }}</td>
+                            <td>{{ row[6] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const downloadBtn = document.getElementById('btn-download');
+        downloadBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            let url = '{{ url_for("pdf_laporan_penjualan") }}';
+            const tahun = document.getElementById('tahun').value;
+            const bulan = document.getElementById('bulan').value;
+            const tanggal = document.getElementById('tanggal').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            if (document.getElementById('filterType1').checked) {
+                // Form 1 is active (Tahun/Bulan/Tanggal)
+                if (tahun) {
+                    url += `?tahun=${tahun}`;
+                    if (bulan) url += `&bulan=${bulan}`;
+                    if (tanggal) url += `&tanggal=${tanggal}`;
+                } else {
+                    alert("Pilih setidaknya tahun untuk men-download laporan.");
+                    return;
+                }
+            } else if (document.getElementById('filterType2').checked) {
+                // Form 2 is active (Rentang Tanggal)
+                if (startDate && endDate) {
+                    url += `?start_date=${startDate}&end_date=${endDate}`;
+                } else {
+                    alert("Pilih tanggal awal dan akhir untuk men-download laporan.");
+                    return;
+                }
+            }
+
+            window.open(url, '_blank');
+        });
+
+        // Tambahkan kode ini di dalam event listener DOMContentLoaded yang sudah ada
+
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+
+        // Set batas maksimal untuk kedua input tanggal ke hari ini
+        const today = new Date().toISOString().split('T')[0];
+        startDateInput.setAttribute('max', today);
+        endDateInput.setAttribute('max', today);
+
+        // Event listener untuk "Dari Tanggal"
+        startDateInput.addEventListener('change', function () {
+            // Set tanggal minimal untuk "Ke Tanggal" ke tanggal yang dipilih di "Dari Tanggal"
+            endDateInput.setAttribute('min', this.value);
+
+            // Jika tanggal "Ke Tanggal" lebih awal dari "Dari Tanggal", reset nilainya
+            if (endDateInput.value && endDateInput.value < this.value) {
+                endDateInput.value = '';
+            }
+        });
+
+        // Event listener untuk "Ke Tanggal"
+        endDateInput.addEventListener('change', function () {
+            // Set tanggal maksimal untuk "Dari Tanggal" ke tanggal yang dipilih di "Ke Tanggal"
+            startDateInput.setAttribute('max', this.value);
+        });
+
+        const form = document.getElementById('filter-form');
+        const tahunSelect = document.getElementById('tahun');
+        const bulanSelect = document.getElementById('bulan');
+        const tanggalSelect = document.getElementById('tanggal');
+        const transactionData = document.getElementById('transaction-data');
+        const tableContainer = document.getElementById('table-container');
+
+        // Set select bulan dan tanggal disabled saat awal
+        bulanSelect.disabled = true;
+        tanggalSelect.disabled = true;
+
+        function updateTanggal() {
+            const tahun = tahunSelect.value;
+            const bulan = bulanSelect.value;
+
+            tanggalSelect.innerHTML = '<option value="">Pilih Tanggal</option>';
+            tanggalSelect.disabled = true;
+
+            if (tahun && bulan) {
+                const daysInMonth = new Date(tahun, bulan, 0).getDate();
+                for (let day = 1; day <= daysInMonth; day++) {
+                    tanggalSelect.innerHTML += `<option value="${String(day).padStart(2, '0')}">${day}</option>`;
+                }
+                tanggalSelect.disabled = false;
+            }
+        }
+
+        // Event listener untuk tahun
+        tahunSelect.addEventListener('change', function () {
+            if (this.value) {
+                bulanSelect.disabled = false;
+            } else {
+                bulanSelect.disabled = true;
+                tanggalSelect.disabled = true;
+                bulanSelect.value = '';
+                tanggalSelect.value = '';
+            }
+            updateTanggal();
+        });
+
+        // Event listener untuk bulan
+        bulanSelect.addEventListener('change', function () {
+            if (this.value) {
+                updateTanggal();
+            } else {
+                tanggalSelect.disabled = true;
+                tanggalSelect.value = '';
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const tahun = tahunSelect.value;
+            const bulan = bulanSelect.value;
+            const tanggal = tanggalSelect.value;
+            let url = `{{ url_for('laporan_penjualan') }}?tahun=${tahun}`;
+
+            if (bulan) {
+                url += `&bulan=${bulan}`;
+            }
+
+            if (tanggal) {
+                url += `&tanggal=${tanggal}`;
+            }
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    tableContainer.innerHTML = data;  // Ganti seluruh konten tabel
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+
+        // Form submission untuk filter range
+        const rangeForm = document.getElementById('filter-range');
+        rangeForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            let url = `{{ url_for('laporan_penjualan') }}?start_date=${startDate}&end_date=${endDate}`;
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    tableContainer.innerHTML = data;  // Ganti seluruh konten tabel
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
+
+
+
+{% endblock %}

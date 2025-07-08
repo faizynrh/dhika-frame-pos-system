@@ -1,0 +1,84 @@
+{% extends 'sidebar.html' %}
+{% block content %}
+
+<!-- MAIN -->
+<main style="position: relative;">
+    <div class="head-title">
+        <div class="left">
+            <h1>Daftar Transaksi</h1>
+        </div>
+    </div>
+
+    <div class="row flex-wrap">
+        <!-- Kolom kiri untuk daftar produk -->
+        <div class="col-md-8">
+            <div class="table-data">
+                <div class="order">
+                    <div class="row">
+                        {% for product in produk %}
+                        <div class="col-md-3 col-sm-6 mb-4">
+                            <div class="card h-150" style="max-width: 200px;">
+                                <img src="{{ url_for('static', filename='images/' + product[6]) }}" class="card-img-top"
+                                    alt="{{ product[1] }}" style="width: 100%; height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ product[1] }}</h5>
+                                    <p class="card-text">{{ product[3] }}</p>
+                                </div>
+                                <div class="card-footer">
+                                    <h6 class="text-warning">Rp {{ product[4] }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kolom kanan untuk keranjang belanja -->
+        <div class="col-md-4">
+            <div class="card" style="height: 85vh;">
+                <div class="card-header bg-warning text-white">
+                    <h5><i class="bx bxs-cart"></i> Keranjang Anda</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <img src="{{ url_for('static', filename='images/ikan_bakar.jpg') }}" alt="Ikan Bakar"
+                            style="width: 50px; height: 50px; object-fit: cover;">
+                        <div>
+                            <p class="mb-0">Ikan Bakar</p>
+                            <small class="text-muted">17000</small>
+                        </div>
+                        <button class="btn btn-warning btn-sm">HAPUS</button>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <img src="{{ url_for('static', filename='images/jus_jeruk.jpg') }}" alt="Jus Jeruk"
+                            style="width: 50px; height: 50px; object-fit: cover;">
+                        <div>
+                            <p class="mb-0">Jus Jeruk</p>
+                            <small class="text-muted">7000</small>
+                        </div>
+                        <button class="btn btn-warning btn-sm">HAPUS</button>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <img src="{{ url_for('static', filename='images/jus_jeruk.jpg') }}" alt="Jus Jeruk"
+                            style="width: 50px; height: 50px; object-fit: cover;">
+                        <div>
+                            <p class="mb-0">Jus Jeruk</p>
+                            <small class="text-muted">7000</small>
+                        </div>
+                        <button class="btn btn-warning btn-sm">HAPUS</button>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <p class="mb-1">TOTAL: <strong>31000</strong></p>
+                    <p class="mb-1">BAYAR: <input type="text" value="0" class="form-control d-inline w-50"></p>
+                    <p class="mb-1">KEMBALI: <strong>0</strong></p>
+                    <button class="btn btn-warning w-100">Simpan Penjualan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

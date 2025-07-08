@@ -1,0 +1,44 @@
+{% extends 'sidebar.html' %}
+
+{% block content %}
+<main>
+    <div class="head-title">
+        <div class="left">
+            <h1>Laporan Stok Barang</h1>
+            <ul class="breadcrumb">
+                <li><a href="#">Dashboard</a></li>
+                <li><i class="bx bx-chevron-right"></i></li>
+                <li><a class="active" href="#">Laporan Stok</a></li>
+            </ul>
+        </div>
+        <a class="btn-download" href="/generate_stock_report">
+            <i class="bx bxs-cloud-download"></i>
+            <span class="text">Download PDF</span>
+        </a>
+    </div>
+    <div class="table-data">
+        <div class="order">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kode Barang</th>
+                        <th>Nama Produk</th>
+                        <th>Kategori</th>
+                        <th>Stok</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in stok_barang %}
+                    <tr>
+                        <td>{{ row[1] }}</td>
+                        <td>{{ row[2] }}</td>
+                        <td>{{ row[8] }}</td>
+                        <td>{{ row[6] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+{% endblock %}

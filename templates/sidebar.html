@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <link href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='boxicons-2.1.4/css/boxicons.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bs/css/bootstrap.min.css') }}">
+</head>
+
+<body>
+    <section id="sidebar" class="d-flex flex-column vh-100 mt-0" style="z-index: auto;">
+        <a href="#" class="brand">
+            <i class="bx bxs-smile"></i>
+            <span class="text">Dhika Frame</span>
+        </a>
+        <ul class="side-menu top list-unstyled">
+            {% if session['role'] == 'superadmin' %}
+            <li class="{{ 'active' if active_page == 'dashboard' else '' }}">
+                <a href="/dashboard">
+                    <i class="bx bxs-dashboard"></i>
+                    <span class="text">Dasbor</span>
+                </a>
+            </li>
+            <li class="{{ 'active' if active_page == 'kategori_barang' else '' }}">
+                <a href="/kategori_barang">
+                    <i class="bx bxs-layer"></i>
+                    <span class="text">Kategori Barang</span>
+                </a>
+            </li>
+            <li class="{{ 'active' if active_page == 'daftar_barang' else '' }}">
+                <a href="/daftar_barang">
+                    <i class="bx bxs-box"></i>
+                    <span class="text">Daftar Barang</span>
+                </a>
+            </li>
+            <li class="{{ 'active' if active_page == 'kelola_akun' else '' }}">
+                <a href="/kelola_akun">
+                    <i class="bx bxs-user-detail"></i>
+                    <span class="text">Kelola Akun</span>
+                </a>
+            </li>
+            <li class="{{ 'active' if active_page == 'transaksibc' else '' }}">
+                <a href="/transaksibc">
+                    <i class="bx bxs-wallet-alt"></i>
+                    <span class="text">Transaksi</span>
+                </a>
+            </li>
+            <li class="{{ 'active' if active_page == 'laporan_penjualan' else '' }}">
+                <a href="/laporan_penjualan">
+                    <i class="bx bxs-report"></i>
+                    <span class="text">Laporan Penjualan</span>
+                </a>
+            </li>
+            <li class="{{ 'active' if active_page == 'riwayat' else '' }}">
+                <a href="/riwayat">
+                    <i class="bx bxs-bookmark"></i>
+                    <span class="text">Riwayat Aktivitas</span>
+                </a>
+            </li>
+            <ul class="side-menu list-unstyled">
+                <li class="mt-auto">
+                    <a href="/logout" class="logout">
+                        <i class="bx bxs-log-out-circle"></i>
+                        <span class="text">Keluar</span>
+                    </a>
+                </li>
+            </ul>
+            {% elif session['role'] == 'petugas' %}
+            <li class="{{ 'active' if active_page == 'kategori_barang' else '' }}">
+                <a href="/kategori_barang">
+                    <i class="bx bxs-category"></i>
+                    <span class="text">Kategori Barang</span>
+                </a>
+            </li>
+            <li class="{{ 'active' if active_page == 'daftar_barang' else '' }}">
+                <a href="/daftar_barang">
+                    <i class="bx bxs-box"></i>
+                    <span class="text">Daftar Barang</span>
+                </a>
+            </li>
+            <!-- <li class="{{ 'active' if active_page == 'riwayat' else '' }}">
+                <a href="/riwayat">
+                    <i class="bx bxs-bookmark"></i>
+                    <span class="text">Riwayat Aktivitas</span>
+                </a>
+            </li> -->
+            {% elif session['role'] == 'kasir' %}
+            <li class="{{ 'active' if active_page == 'transaksibc' else '' }}">
+                <a href="/transaksibc">
+                    <i class="bx bxs-wallet-alt"></i>
+                    <span class="text">Transaksi</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </section>
+    <section id="content">
+        <nav>
+            <i class="bx bx-menu"></i>
+            <span>{{ greeting }} , Anda Masuk Sebagai {{hak_akses}}</span>
+            {% if session['role'] == 'petugas' or session['role'] == 'kasir' %}
+            <span id="clock" style="margin-left: 300px; "></span>
+            <a href="/logout" class="logout" style="margin-left: auto; text-decoration:none;">
+                <i class="bx bxs-log-out-circle"></i>
+                <span class="text" style="text-decoration: none;">Keluar</span>
+            </a>
+            {% else %}
+            <span id="clock" style="margin-left: auto;"></span>
+            {% endif %}
+        </nav>
+        {% block content %} {% endblock %}
+    </section>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const activePage = "{{ active_page }}";
+            if (activePage === 'transaksibc' || activePage === 'detailtransaksi' || activePage === 'riwayat' || activePage === 'laporan_penjualan') {
+                const menuElement = document.querySelector('.bx-menu');
+                if (menuElement) {
+                    menuElement.click();
+                }
+            }
+        });
+        function updateClock() {
+            const clockElement = document.getElementById('clock');
+            const now = new Date();
+            now.setHours(now.getHours());
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            clockElement.textContent = hours + ':' + minutes + ':' + seconds + ' WIB';
+        }
+        setInterval(updateClock, 1000);
+        updateClock();  // Call it once to avoid delay
+    </script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='bs/js/bootstrap.bundle.min.js') }}"></script>
+</body>
+
+</html>

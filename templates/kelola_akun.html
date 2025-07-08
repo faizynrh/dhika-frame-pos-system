@@ -1,0 +1,295 @@
+{% extends 'sidebar.html' %} {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="container">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<!-- MAIN -->
+<main>
+    <div class="head-title">
+        <div class="left">
+            <h1>Daftar Akun</h1>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">Dasbor</a>
+                </li>
+                <li><i class="bx bx-chevron-right"></i></li>
+                <li>
+                    <a class="active" href="{{ url_for('kelola_akun')}}">Kelola Akun</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="table-data">
+        <div class="order">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inputakun">
+                    + Tambah Akun
+                </button>
+                <input class="form-control w-25 me-5" type="search" id="searchInput" placeholder="Cari"
+                    aria-label="Search" style="background-color: #ffffff;">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    {% for users in users %}
+                    <tr>
+                        <td>{{ loop.index }}</td> <!-- Menampilkan nomor urut dari loop -->
+                        <td>{{ users[1] }}</td>
+                        <td>{{ users[3] }}</td>
+                        <td>{{ users[4] }}</td>
+                        <td>
+                            {% if users[4] == 'superadmin' %}
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#superadmin">Super Admin</button>
+                            {% else %}
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                data-bs-target="#editakun" data-id="{{ users[0] }}" data-username="{{ users[1] }}"
+                                data-password="{{ users[2] }}" data-email="{{ users[3] }}" data-role="{{ users[4] }}">
+                                Ubah
+                            </button>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#hapusakun" data-bs-id="{{ users[0] }}">
+                                Hapus
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<div class="modal fade" id="inputakun" tabindex="-1" aria-labelledby="inputakun" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inputakunLabel">Tambah Akun</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="akunForm" method="post" action="{{ url_for('tambah_akun') }}"
+                onsubmit="return validatePasswords()">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Hak Akses</label>
+                        <select class="form-control" id="role" name="role" required>
+                            <option value="" disabled selected>Pilih Hak Akses</option>
+                            <option value="petugas">Petugas</option>
+                            <option value="kasir">Kasir</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Konfirmasi Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                            required>
+                        <div id="passwordError" class="text-danger mt-2" style="display: none;">Password dan Konfirmasi
+                            Password Anda Tidak Cocok</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="editakun" tabindex="-1" aria-labelledby="editakun" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Akun</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editakunForm" method="post" action="">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="edit_username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="edit_email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Hak Akses</label>
+                        <select class="form-control" id="edit_role" name="role" required>
+                            <option value="" disabled selected>Pilih Hak Akses</option>
+                            <option value="petugas">Petugas</option>
+                            <option value="kasir">Kasir</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="edit_password" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Konfirmasi Password</label>
+                        <input type="password" class="form-control" id="edit_confirmPassword" name="confirmPassword"
+                            required>
+                        <div id="passwordError" class="text-danger mt-2" style="display: none;">Password dan Konfirmasi
+                            Password Anda Tidak Cocok</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="hapusakun" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Konfirmasi Penghapusan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Apakah Anda yakin ingin menghapus produk ini?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <form id="hapusForm" action="/hapus_akun/{{ users[0] }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Hapus</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="superadmin" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exaModalLabel">Pemberitahuan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Aksi Ini Tidak Dapat Dilakukan Pada Role <strong>superadmin</strong>.
+                <br><br>
+                Untuk Bantuan, Hubungi:
+                <a href="mailto:faizyanuarhern@gmail.com">Pemilik Aplikasi</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const hapusAkunModal = document.getElementById('hapusakun');
+    hapusAkunModal.addEventListener('show.bs.modal', function (event) {
+        // Tombol yang memicu modal
+        const button = event.relatedTarget;
+        // Ambil akun_id dari atribut data-bs-id
+        const akunId = button.getAttribute('data-bs-id');
+        // Perbarui form hapus dengan akun_id yang benar
+        const form = document.getElementById('hapusForm');
+        form.action = '/hapus_akun/' + akunId;
+    });
+
+    const editModal = document.getElementById('editakun');
+    editModal.addEventListener('show.bs.modal', function (event) {
+        // Ambil tombol yang mengaktifkan modal
+        const button = event.relatedTarget;
+
+        // Ambil data produk dari atribut data- pada tombol
+        const akunId = button.getAttribute('data-id');
+        const username = button.getAttribute('data-username');
+        const password = button.getAttribute('data-password');
+        const email = button.getAttribute('data-email');
+        const role = button.getAttribute('data-role');
+
+        // Isi form di dalam modal dengan data produk yang diambil
+        const modalForm = editModal.querySelector('form');
+        modalForm.action = `/edit_akun/${akunId}`;
+        modalForm.querySelector('#edit_username').value = username;
+        modalForm.querySelector('#edit_email').value = email;
+        modalForm.querySelector('#edit_role').value = role;
+        modalForm.querySelector('#edit_password').value = password;
+        modalForm.querySelector('#edit_confirmPassword').value = password;
+    });
+    function validatePasswords() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const passwordError = document.getElementById('passwordError');
+
+        if (password !== confirmPassword) {
+            passwordError.style.display = 'block';
+            return false; // Mencegah form untuk submit jika password tidak sama
+        } else {
+            passwordError.style.display = 'none';
+            return true; // Melanjutkan submit form jika password sama
+        }
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const query = this.value; // Ambil nilai input pencarian
+
+        // Lakukan permintaan AJAX ke server
+        fetch(`/search_users?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                const usersTableBody = document.getElementById('usersTableBody');
+                usersTableBody.innerHTML = ''; // Kosongkan isi tabel sebelumnya
+
+                // Loop melalui data yang diterima dan perbarui tabel
+                data.forEach((user, index) => {
+                    const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>${user.role}</td>
+                        <td>
+                            ${user.role === 'superadmin' ? `
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#superadmin">Super Admin</button>
+                            ` : `
+                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editakun" 
+                                    data-id="${user.id}" data-username="${user.username}" data-password="${user.password}" 
+                                    data-email="${user.email}" data-role="${user.role}">
+                                    Edit
+                                </button>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#hapusakun" data-bs-id="${user.id}">
+                                    Hapus
+                                </button>
+                            `}
+                        </td>
+                    </tr>
+                `;
+                    usersTableBody.insertAdjacentHTML('beforeend', row);
+                });
+            })
+            .catch(error => console.error('Error fetching search results:', error));
+    });
+
+
+</script>
+{% endblock %}

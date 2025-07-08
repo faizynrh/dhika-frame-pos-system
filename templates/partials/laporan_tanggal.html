@@ -1,0 +1,24 @@
+<table>
+    <thead>
+        <tr>
+            <th>ID Transaksi</th>
+            <th>User ID</th>
+            <th>Total Harga</th>
+            <th>Bayar</th>
+            <th>Kembali</th>
+            <th>Tanggal Transaksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in transaksi_detail %}
+        <tr>
+            <td>{{ row[0] }}</td> <!-- ID Transaksi -->
+            <td>{{ row[1] }}</td> <!-- User ID -->
+            <td>Rp. {{ "{:,.0f}".format(row[2]) }}</td> <!-- Total Harga -->
+            <td>Rp. {{ "{:,.0f}".format(row[3]) }}</td> <!-- Bayar -->
+            <td>Rp. {{ "{:,.0f}".format(row[4]) }}</td> <!-- Kembali -->
+            <td>{{ row[5] }}</td> <!-- Tanggal Transaksi (tidak diubah) -->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

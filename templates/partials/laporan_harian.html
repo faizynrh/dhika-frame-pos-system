@@ -1,0 +1,20 @@
+<table>
+    <thead>
+        <tr>
+            <th>Tanggal</th>
+            <th>Total Pendapatan</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set bulan_mapping = {
+        1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April', 5: 'Mei', 6: 'Juni',
+        7: 'Juli', 8: 'Agustus', 9: 'September', 10: 'Oktober', 11: 'November', 12: 'Desember'
+        } %}
+        {% for row in penjualan_harian %}
+        <tr>
+            <td>{{ row[0] }} {{ bulan_mapping[bulan|int] }}</td>
+            <td>Rp. {{ "{:,.0f}".format(row[1]) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
