@@ -37,7 +37,7 @@ This system is designed to help small businesses manage their inventory and tran
 
 1. **Import the Database**
    - Open **PhpMyAdmin**
-   - Import the file `dhika_inventory.sql`
+   - Import the file `dhika_frame(4).sql`
 
 2. **Install Python**
    - Download and install Python from [python.org](https://www.python.org/downloads/)
